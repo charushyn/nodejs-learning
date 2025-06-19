@@ -3,11 +3,11 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import cors from "cors";
 
-import { movie_router } from "./entities/movie/routes.js";
+import { movie_router } from "./entities/movie/routes";
 
 import express from "express";
 
-mongoose.connect(process.env.DB_URL);
+mongoose.connect(process.env.DB_URL || "");
 
 const app = express();
 const port = 3000;
