@@ -1,12 +1,19 @@
 import { Schema, model, Types } from "mongoose";
 
-const MovieSchema = new Schema({
-  title: String,
-  year: Number,
-  rating: Number,
-  category: { type: Types.ObjectId, ref: "Category" },
+interface MovieType {
+  title: string;
+  year: number;
+  rating: number;
+  director: Types.ObjectId;
+}
+
+const MovieSchema = new Schema<MovieType>({
+  title: { type: String, required: true },
+  year: { type: Number, required: true },
+  rating: { type: Number, required: true },
+  director: { type: Schema.Types.ObjectId, ref: "Director", required: true },
 });
 
-const MovieModel = model("Movie", MovieSchema);
+const MovieModel = model<MovieType>("Movie", MovieSchema, "movies");
 
-export default MovieModel;
+export { MovieType, MovieModel };

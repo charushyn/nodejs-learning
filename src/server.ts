@@ -6,6 +6,9 @@ import cors from "cors";
 import { movie_router } from "./entities/movie/routes";
 
 import express from "express";
+import { category_router } from "./entities/category/routes";
+import { comment_router } from "./entities/comment/routes";
+import { director_router } from "./entities/director/routes";
 
 mongoose.connect(process.env.DB_URL || "");
 
@@ -21,6 +24,9 @@ app.use(
 );
 
 app.use("/movies", movie_router);
+app.use("/categories", category_router);
+app.use("/comments", comment_router);
+app.use("/directors", director_router);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
