@@ -9,6 +9,7 @@ import express from "express";
 import { category_router } from "./entities/category/routes";
 import { comment_router } from "./entities/comment/routes";
 import { director_router } from "./entities/director/routes";
+import { errorHandler } from "./utils/middleware/error";
 
 mongoose.connect(process.env.DB_URL || "");
 
@@ -27,6 +28,8 @@ app.use("/movies", movie_router);
 app.use("/categories", category_router);
 app.use("/comments", comment_router);
 app.use("/directors", director_router);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);

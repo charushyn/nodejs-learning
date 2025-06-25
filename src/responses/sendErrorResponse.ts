@@ -1,11 +1,15 @@
 import { Response } from "express";
+import { AppError } from "../utils/types/AppError";
 
-const sendErrorResponse = async (
+const sendErrorResponse = (
   res: Response,
-  error: Error,
-  status: number
+  error: Error | AppError,
+  status = 500
 ) => {
-  res.status(status ? status : 500).end(error.message);
+  res.status(status).json({
+    error: error.message,
+    ...(error instanceof AppError && error.data ? { details: error.data } : {}),
+  });
 };
 
 export { sendErrorResponse };
