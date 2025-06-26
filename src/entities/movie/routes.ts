@@ -5,13 +5,24 @@ import {
   getMovieById,
   getMovies,
   updateMovieById,
+  testFn,
+  testFnSecond,
 } from "./controller";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { validateRequest } from "../../utils/middleware/validateRequest";
 
 const router = express.Router();
 
-router.get("/", getMovies);
+router.get(
+  "/",
+  query("title").optional(),
+  query("sort")
+    .optional()
+    .isBoolean()
+    .withMessage("sort should be a boolean value"),
+  validateRequest,
+  getMovies
+);
 router.post(
   "/",
   body("title")
@@ -75,5 +86,9 @@ router.put(
   validateRequest,
   updateMovieById
 );
+
+router.post("/test", testFn);
+
+router.post("/test2", testFnSecond);
 
 export { router as movie_router };

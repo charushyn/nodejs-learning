@@ -1,8 +1,6 @@
 import { DirectorModel, DirectorType } from "./model";
 import { sendOkResponse, sendErrorResponse } from "../../responses";
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { AppError } from "../../utils/types/AppError";
 
 export const getDirectors = async (req: Request, res: Response) => {
   const directors_response = await DirectorModel.find();

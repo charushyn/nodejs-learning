@@ -1,11 +1,22 @@
 import { MovieModel, MovieType } from "./model";
 import { sendOkResponse, sendErrorResponse } from "../../responses";
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { AppError } from "../../utils/types/AppError";
+import mongoose from "mongoose";
 
 export const getMovies = async (req: Request, res: Response) => {
-  const movies = await MovieModel.find().lean().populate("director");
+  const { title, sort } = req.query;
+
+  const query = MovieModel.find();
+
+  if (title) {
+    query.where("title").equals(title);
+  }
+
+  if (sort) {
+    query.sort({ year: -1 });
+  }
+
+  const movies = await query.lean().populate("director").exec();
 
   sendOkResponse(res, 200, movies);
 };
@@ -23,7 +34,7 @@ export const createMovie = async (req: Request, res: Response) => {
 };
 
 export const getMovieById = async (req: Request, res: Response) => {
-  const movie_response = await MovieModel.findById(req.params.movieId);
+  const movie_response = await MovieModel.findById(req.params.movieId).exec();
 
   if (!movie_response) {
     throw new Error(`No movie was finded by ID:${req.params.movieId}`);
@@ -61,4 +72,31 @@ export const updateMovieById = async (req: Request, res: Response) => {
   }
 
   sendOkResponse(res, 204, movie_response);
+};
+
+export const testFn = async (req: Request, res: Response) => {
+  const directorId: string = req.body.directorId;
+
+  const aggregate = await MovieModel.aggregate([
+    {
+      $match: { director: new mongoose.Types.ObjectId(directorId) },
+    },
+  ]);
+
+  sendOkResponse(res, 200, aggregate);
+};
+
+export const testFnSecond = async (req: Request, res: Response) => {
+  const aggregate = await MovieModel.aggregate([
+    {
+      $match: {
+        year: {
+          $gte: 1999,
+          $lt: 2010,
+        },
+      },
+    },
+  ]);
+
+  sendOkResponse(res, 200, aggregate);
 };

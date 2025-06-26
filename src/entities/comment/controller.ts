@@ -1,8 +1,6 @@
 import { CommentModel, CommentType } from "./model";
 import { sendOkResponse, sendErrorResponse } from "../../responses";
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { AppError } from "../../utils/types/AppError";
 
 export const getComments = async (req: Request, res: Response) => {
   const comments_response = await CommentModel.find();

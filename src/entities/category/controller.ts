@@ -1,8 +1,6 @@
 import { CategoryType, CategoryModel } from "./model";
 import { sendOkResponse, sendErrorResponse } from "../../responses";
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { AppError } from "../../utils/types/AppError";
 
 export const getCategories = async (req: Request, res: Response) => {
   const categories = await CategoryModel.find();
