@@ -2,9 +2,16 @@ import { MovieModel, MovieType } from "./model";
 import { sendOkResponse, sendErrorResponse } from "../../responses";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import isObjectEmpty from "../../utils/methods/isObjectEmpty";
+import NodeCache from "node-cache";
+import getMovieCache from "../../utils/cache/getMovieCache";
+
+const cache = new NodeCache();
 
 export const getMovies = async (req: Request, res: Response) => {
   const { title, sort } = req.query;
+
+  let response;
 
   const query = MovieModel.find();
 
@@ -16,9 +23,13 @@ export const getMovies = async (req: Request, res: Response) => {
     query.sort({ year: -1 });
   }
 
-  const movies = await query.lean().populate("director").exec();
+  if (isObjectEmpty({ ...req.query })) {
+    response = await getMovieCache(query, cache);
+  } else {
+    response = await query.lean().populate("director").exec();
+  }
 
-  sendOkResponse(res, 200, movies);
+  sendOkResponse(res, 200, { response });
 };
 
 export const createMovie = async (req: Request, res: Response) => {
