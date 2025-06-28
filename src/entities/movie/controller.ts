@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import isObjectEmpty from "../../utils/methods/isObjectEmpty";
 import NodeCache from "node-cache";
 import getMovieCache from "../../utils/cache/getMovieCache";
+import { AppError } from "../../utils/types/AppError";
 
 const cache = new NodeCache();
 
@@ -41,6 +42,8 @@ export const createMovie = async (req: Request, res: Response) => {
   };
   const movie_response: MovieType = await MovieModel.create(movie);
 
+  cache.set("defaultMovies", movie_response, 3600);
+
   sendOkResponse(res, 201, movie_response);
 };
 
@@ -76,11 +79,13 @@ export const updateMovieById = async (req: Request, res: Response) => {
   const movie_response = await MovieModel.findByIdAndUpdate(
     movieId,
     new_movie_data
-  );
+  ).exec();
 
   if (!movie_response) {
-    throw new Error(`No movie was finded by ID:${movieId}`);
+    throw new AppError(`No movie was finded by ID:${movieId}`, 404);
   }
+
+  cache.set("defaultMovies", movie_response, 3600);
 
   sendOkResponse(res, 204, movie_response);
 };

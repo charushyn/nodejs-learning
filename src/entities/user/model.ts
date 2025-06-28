@@ -8,16 +8,16 @@ interface UserType {
   email: string;
   username: string;
   roles: UserRole[];
-  password: string;
+  token: string;
 }
 
 const UserSchema = new Schema<UserType>({
   email: { type: String, required: true },
   username: { type: String, required: true },
   roles: { type: [String], required: true },
-  password: { type: String, required: true },
+  token: { type: String, required: true },
 });
 
 const UserModel = model<UserType>("User", UserSchema, "users");
 
-export { UserType, UserModel, USER_ROLES };
+export { UserType, UserModel, USER_ROLES, UserRole };
