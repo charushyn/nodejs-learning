@@ -10,7 +10,11 @@ import createToken from "../../utils/jwt/createToken";
 const createUser = async (req: Request, res: Response) => {
   const { email, username, roles, password } = req.body;
 
-  const token = createToken({ email: email, password: password });
+  
+
+
+
+  const token = createToken({ email: email, hashedPassword: '' });
 
   const user: UserType = {
     email: email,
@@ -24,33 +28,58 @@ const createUser = async (req: Request, res: Response) => {
   sendOkResponse(res, 201, { user_response });
 };
 
-const authenticateUser = async (req: Request, res: Response) => {
-  const authHeader = req.get("Authorization")?.split(":");
+const updateUserUsername = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-  if (!authHeader || !Array.isArray(authHeader)) {
+  
+
+  sendOkResponse(res, 200, {});
+};
+
+const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  sendOkResponse(res, 200, {});
+};
+
+const authenticateUser = async (req: Request, res: Response) => {
+  const authHeader = req.get("Authorization");
+
+  if (!authHeader) {
     throw new AppError("Header problem, missing :", 400);
   }
 
-  const header_email = authHeader[0];
-  const header_token = authHeader[1];
+  console.log(authHeader);
 
-  const user = await UserModel.findOne({ email: header_email }).lean().exec();
+  const decoded_auth_jwt = jwt.decode(authHeader);
+
+  if (typeof decoded_auth_jwt === "string" || decoded_auth_jwt === null) {
+    throw new AppError("Bad token", 404);
+  }
+
+  const user = await UserModel.findOne({ email: decoded_auth_jwt.email })
+    .lean()
+    .exec();
 
   if (user === null) {
     throw new AppError("User is undefined with this email", 404);
   }
 
-  const decoded_jwt = jwt.decode(user.token);
+  const decoded_auth_user = jwt.decode(user.token);
 
-  console.log(decoded_jwt);
+  console.log(decoded_auth_user);
 
-  // if (user.token !== header_token) {
-  //   throw new AppError(`Wrong password for: ${header_email}`, 401);
-  // }
+  if (typeof decoded_auth_user === "string" || decoded_auth_jwt === null) {
+    throw new AppError("Bad token", 404);
+  }
 
-  // res.header("Authorization", `${user.email}:${user.token}`);
+  if (decoded_auth_user?.password !== decoded_auth_jwt.password) {
+    throw new AppError(`Wrong credentials`, 401);
+  }
 
-  sendOkResponse(res, 200, { user });
+  res.header("Authorization", `${user.token}`);
+
+  sendOkResponse(res, 200, {});
 };
 
-export { createUser, authenticateUser };
+export { createUser, authenticateUser, updateUserUsername, deleteUser };

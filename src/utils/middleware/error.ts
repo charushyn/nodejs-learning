@@ -1,17 +1,22 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import { Request, Response, ErrorRequestHandler } from "express";
 import { AppError } from "../types/AppError";
 
 export const errorHandler: ErrorRequestHandler = (
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({
+    let json_err_body = {
       message: err.message,
-      ...(err.data && { details: err.data }),
-    });
+    }
+    if(err.data && err.data.constructor === Object){
+      json_err_body = {
+        ...json_err_body,
+        ...err.data
+      }
+    }
+    res.status(err.statusCode).json(json_err_body);
     return;
   }
 

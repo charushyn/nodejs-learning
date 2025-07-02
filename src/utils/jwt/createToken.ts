@@ -4,20 +4,22 @@ import jwt from "jsonwebtoken";
 
 type CreateTokenProps = {
   email: string;
-  password: string;
+  hashedPassword: string;
 };
 
 export default function createToken({
   email,
-  password,
+  hashedPassword,
 }: CreateTokenProps): string {
   if (!process.env.JWT_SECRET) {
     throw new AppError("AUTH CREATE SERICE UNAVALIABLE", 500);
   }
 
   const signed_token = jwt.sign(
-    { email: email, password: password },
-    process.env.JWT_SECRET
+    { email: email, hashedPassword: hashedPassword
+
+     },
+    process.env.JWT_SECRET,
   );
 
   return signed_token;

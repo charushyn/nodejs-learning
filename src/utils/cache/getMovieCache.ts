@@ -1,5 +1,5 @@
 import NodeCache from "node-cache";
-import mongoose, { Query, FlattenMaps } from "mongoose";
+import { Query, FlattenMaps } from "mongoose";
 import { MovieType } from "../../entities/movie/model";
 
 export default async function getMovieCache(

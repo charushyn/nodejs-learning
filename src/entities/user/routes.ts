@@ -1,8 +1,9 @@
 import express from "express";
 import { validateRequest } from "../../utils/middleware/validateRequest";
 import { body, header, param } from "express-validator";
-import { authenticateUser, createUser } from "./controller";
+import { authenticateUser, createUser, updateUserUsername } from "./controller";
 import { USER_ROLES, UserModel, UserRole } from "./model";
+import verifyToken from "../../utils/jwt/verifyToken";
 const router = express.Router();
 
 router.post(
@@ -53,5 +54,7 @@ router.get(
   validateRequest,
   authenticateUser
 );
+
+router.put("/username", verifyToken, updateUserUsername);
 
 export { router as user_router };
